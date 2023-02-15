@@ -7,9 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.cardview.widget.CardView
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,6 +45,19 @@ class MovieFragment : Fragment() {
         return view
     }
 
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?){
+        super.onViewCreated(view, savedInstanceState)
+
+        recyclerAdapter.onItemClick = {
+
+            Toast.makeText(context, "id" + it.id, Toast.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.action_movieFragment_to_detailFragment)
+        }
+    }
+
+
+
     private fun initViewModel(view: View) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(activity)
@@ -48,12 +65,8 @@ class MovieFragment : Fragment() {
         recyclerView.addItemDecoration(decoration)
 
         recyclerAdapter = RecyclerViewAdapter(emptyList<Movie>()){}
-
         recyclerView.adapter = recyclerAdapter
 
-        recyclerAdapter.onItemClick = { Toast.makeText(context,"id" + it.id, Toast.LENGTH_SHORT).show()
-        //Navigation.findNavController(view).navigate(R.id.action_movieFragment_to_detailFragment)
-        }
     }
 
     private fun initViewModel(){
@@ -66,14 +79,5 @@ class MovieFragment : Fragment() {
             }
         })
         viewModel.makeApiCall()
-    }
-
-
-    companion object {
-
-        @JvmStatic
-        fun newInstance() =
-            MovieFragment()
-
     }
 }
