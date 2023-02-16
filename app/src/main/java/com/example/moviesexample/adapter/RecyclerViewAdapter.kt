@@ -42,7 +42,7 @@ class RecyclerViewAdapter(
 
             val url = "https://image.tmdb.org/t/p/w780/${data.poster_path}"
 
-            Log.d(TAG, "my")
+
 
             Picasso.get()
                 .load(url)

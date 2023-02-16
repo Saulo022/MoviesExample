@@ -1,6 +1,8 @@
 package com.example.moviesexample
 
+import android.content.ContentValues
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +11,7 @@ import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
@@ -29,6 +32,8 @@ class MovieFragment : Fragment() {
 
     private var _binding: FragmentMovieBinding? = null
     private val binding:FragmentMovieBinding get() = _binding!!
+
+    private val sharedViewModel : MovieViewModel by activityViewModels()
 
     private lateinit var adapter: RecyclerViewAdapter
     private lateinit var recyclerAdapter : RecyclerViewAdapter
@@ -52,11 +57,12 @@ class MovieFragment : Fragment() {
         recyclerAdapter.onItemClick = {
 
             Toast.makeText(context, "id" + it.id, Toast.LENGTH_SHORT).show()
+            sharedViewModel.saveId(it.id)
+            sharedViewModel.saveMovie(it)
             findNavController().navigate(R.id.action_movieFragment_to_detailFragment)
+
         }
     }
-
-
 
     private fun initViewModel(view: View) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
