@@ -9,68 +9,66 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.cardview.widget.CardView
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moviesexample.R
 import com.example.moviesexample.data.Movie
+import com.example.moviesexample.data.MovieList
+import com.example.moviesexample.databinding.RecyclerListRowBinding
 import com.squareup.picasso.Picasso
 
-class RecyclerViewAdapter(
-    var movies: List<Movie>,
-    private val movieClickedListener: (Movie) -> Unit
-) : RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder>(){
-
-    var items : List<Movie> = emptyList()
+class RecyclerViewAdapter : PagingDataAdapter<Movie, RecyclerViewAdapter.MyViewHolder>(diffCallback){
 
     var onItemClick : ((Movie) -> Unit)? = null
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun setUpdatedData(items : List<Movie>) {
-        this.items = items
-        notifyDataSetChanged()
-    }
+    inner class MyViewHolder(
+        val binding: RecyclerListRowBinding
+    ) :
+        RecyclerView.ViewHolder(binding.root)
 
-    class MyViewHolder(view: View) : RecyclerView.ViewHolder(view){
-        val imageThumb = view.findViewById<ImageView>(R.id.imageThumb)
-        val tvTitle = view.findViewById<TextView>(R.id.tvTitle)
-        val tvDesc = view.findViewById<TextView>(R.id.tvDesc)
+    companion object {
+        val diffCallback = object : DiffUtil.ItemCallback<Movie>() {
+            override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean {
+                return oldItem.id == newItem.id
+            }
 
-        val rvMovie = view.findViewById<RecyclerView>(R.id.recyclerView)
-
-        fun bind(data : Movie) {
-            tvTitle.text = data.title
-            tvDesc.text = data.overview
-
-            val url = "https://image.tmdb.org/t/p/w780/${data.poster_path}"
-
-
-
-            Picasso.get()
-                .load(url)
-                .into(imageThumb)
-
+            override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean {
+                return oldItem == newItem
+            }
         }
-
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_list_row, parent, false)
-        return MyViewHolder(view)
-
+        return MyViewHolder(
+            RecyclerListRowBinding.inflate(
+                LayoutInflater.from(parent.context), parent, false
+            )
+        )
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.bind(items.get(position))
-        var movie = items.get(position)
+        val movie = getItem(position)
 
+        holder.binding.apply {
+            holder.itemView.apply {
+                tvTitle.text = "${movie?.title}"
+                tvDesc.text = "${movie?.overview}"
 
-        holder.itemView.setOnClickListener { Log.d(TAG, "my Message")
-            onItemClick?.invoke(movie)
-         }
+                val url = "https://image.tmdb.org/t/p/w780/${movie?.poster_path}"
+
+                Picasso.get()
+                    .load(url)
+                    .fit()
+                    .into(imageThumb)
+            }
+        }
+
+        holder.itemView.setOnClickListener {
+            if (movie != null) {
+                onItemClick?.invoke(movie)
+            }
+        }
     }
-
-    override fun getItemCount(): Int {
-        return items.size
-    }
-
 }

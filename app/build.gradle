@@ -4,6 +4,7 @@ plugins {
     id "androidx.navigation.safeargs.kotlin"
     id 'kotlin-parcelize'
     id 'kotlin-kapt'
+    id "com.google.dagger.hilt.android"
 }
 
 android {
@@ -38,7 +39,6 @@ android {
     viewBinding {
         enabled = true
     }
-
 }
 
 dependencies {
@@ -68,6 +68,9 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
+    // DaggerHilt
+    implementation "com.google.dagger:hilt-android:2.44"
+    kapt "com.google.dagger:hilt-android-compiler:2.44"
 
     //Paging3
     def paging_version = "3.1.1"

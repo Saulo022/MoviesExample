@@ -53,6 +53,7 @@ class DetailFragment : Fragment() {
             .load("https://image.tmdb.org/t/p/w780/${sharedViewModel.movies.backdrop_path}")
             .into(binding.backdrop)
 
+
         binding.Title.text = sharedViewModel.movies.title
         binding.overview.text = sharedViewModel.movies.overview
         bindDetailInfo(binding.detailInfo, sharedViewModel.movies)
