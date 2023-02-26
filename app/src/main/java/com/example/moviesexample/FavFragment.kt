@@ -48,7 +48,7 @@ class FavFragment : Fragment() {
                 this@FavFragment.context?.let { Room.databaseBuilder(
                     it, TMDBDatabase::class.java, "popular_movies").build() }
 
-            var movieFavList = room?.getMovieDao()?.getAll()
+            var movieFavList = room?.getMovieDao()?.getFavMovies(true)
 
 
         binding.apply {

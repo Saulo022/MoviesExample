@@ -110,7 +110,7 @@ class MovieFragment : Fragment() {
 
             sharedViewModel.saveId(it.id)
             sharedViewModel.saveMovie(it)
-            findNavController().navigate(R.id.action_movieFragment_to_favFragment)
+            findNavController().navigate(R.id.action_movieFragment_to_detailFragment)
         }
     }
 }

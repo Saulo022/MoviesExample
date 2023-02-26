@@ -6,9 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".DetailFragment">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
@@ -40,6 +38,13 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize" />
+
+            <CheckBox
+                android:id="@+id/favIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/selector_fav_item"
+                app:useMaterialThemeColors="false"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -106,7 +111,16 @@
                 android:text="Movie Title"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/floatingActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:src="?attr/actionModeShareDrawable" />
+
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </FrameLayout>

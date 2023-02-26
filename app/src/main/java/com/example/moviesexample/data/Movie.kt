@@ -17,7 +17,7 @@ data class Movie(
     val poster_path: String,
     val release_date: String,
     val title: String,
-    val video: Boolean,
+    var video: Boolean,
     val vote_average: Double,
     val vote_count: Int
 )

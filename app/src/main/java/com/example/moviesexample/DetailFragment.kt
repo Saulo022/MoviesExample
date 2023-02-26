@@ -14,13 +14,18 @@ import androidx.core.text.buildSpannedString
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Room
 import com.bumptech.glide.Glide
 import com.example.moviesexample.data.Movie
 import com.example.moviesexample.data.MovieList
 import com.example.moviesexample.databinding.FragmentDetailBinding
 import com.example.moviesexample.databinding.FragmentMovieBinding
+import com.example.moviesexample.db.TMDBDatabase
 import com.example.moviesexample.viewModel.MovieViewModel
+import kotlinx.coroutines.launch
 
 
 class DetailFragment : Fragment() {
@@ -39,9 +44,22 @@ class DetailFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentDetailBinding.inflate(inflater,container,false)
+        _binding = FragmentDetailBinding.inflate(inflater, container, false)
         // Inflate the layout for this fragment
         val view = binding.root
+
+        saveCheckBoxState()
+
+        binding.favIcon.setOnCheckedChangeListener { checkBox, isChecked ->
+            if (isChecked) {
+                updateDataToTrue()
+                showToast("Item select")
+            } else {
+                updateDataToFalse()
+                showToast("Item no selected")
+            }
+        }
+        btnClicked()
         return view
     }
 
@@ -76,6 +94,59 @@ class DetailFragment : Fragment() {
 
             bold { append("Vote Average: ")}
             appendLine(movie.vote_average.toString())
+        }
+    }
+
+    private fun showToast(str:String){
+        Toast.makeText(context,str, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun updateDataToTrue(){
+        var id = sharedViewModel.id.value
+        var movie = sharedViewModel.movies
+        movie.video = true
+
+        val room =
+            this@DetailFragment.context?.let { Room.databaseBuilder(
+                it, TMDBDatabase::class.java, "popular_movies").build() }
+
+        lifecycleScope.launch {
+            if (id != null) {
+                if (room != null) {
+                    room.getMovieDao().updateFavMovies(movie)
+                }
+            }
+        }
+    }
+
+    private fun updateDataToFalse(){
+        var id = sharedViewModel.id.value
+        var movie = sharedViewModel.movies
+        movie.video = false
+
+
+        val room =
+            this@DetailFragment.context?.let { Room.databaseBuilder(
+                it, TMDBDatabase::class.java, "popular_movies").build() }
+
+        lifecycleScope.launch {
+            if (id != null) {
+                if (room != null) {
+                    room.getMovieDao().updateFavMovies(movie)
+                }
+            }
+        }
+    }
+
+    private fun btnClicked(){
+        binding.floatingActionButton.setOnClickListener {
+            findNavController().navigate(R.id.action_detailFragment_to_favFragment)
+        }
+    }
+
+    private fun saveCheckBoxState(){
+        if (sharedViewModel.movies.video){
+            binding.favIcon.isChecked = true
         }
     }
 }

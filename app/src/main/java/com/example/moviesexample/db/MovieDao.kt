@@ -1,10 +1,7 @@
 package com.example.moviesexample.db
 
 import androidx.paging.PagingSource
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.moviesexample.data.Movie
 
 @Dao
@@ -17,4 +14,9 @@ interface MovieDao {
     @Query("SELECT * FROM popular_movies")
     suspend fun getAll() : MutableList<Movie>
 
+    @Update
+    suspend fun updateFavMovies(movie: Movie)
+
+    @Query("SELECT * FROM popular_movies WHERE video LIKE :video")
+    suspend fun getFavMovies(video: Boolean): MutableList<Movie>
 }
