@@ -46,15 +46,9 @@ class MovieViewModel : ViewModel() {
         movieFavList.add(id)
     }
 
-    fun removeMovie(){
-        var n:Int
-        n= _id.value!!
+    fun removeMovie(id: Int){
+        movieFavList.remove(id)
 
-        for (i in 0 until movieFavList.size){
-            if (i == n){
-                movieFavList.removeAt(i)
-            }
-        }
     }
 
 

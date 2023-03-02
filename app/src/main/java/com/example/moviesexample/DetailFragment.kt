@@ -34,7 +34,7 @@ class DetailFragment : Fragment() {
     private val binding get() = _binding!!
 
 
-    private val sharedViewModel : MovieViewModel by activityViewModels()
+    private val sharedViewModel: MovieViewModel by activityViewModels()
 
     val room by lazy {
         Room.databaseBuilder(
@@ -87,28 +87,28 @@ class DetailFragment : Fragment() {
 
     private fun bindDetailInfo(detailInfo: TextView, movie: Movie) {
         detailInfo.text = buildSpannedString {
-            bold { append("Original title: ")}
+            bold { append("Original title: ") }
             appendLine(movie.original_title)
 
-            bold { append("Original language: ")}
+            bold { append("Original language: ") }
             appendLine(movie.original_language)
 
-            bold { append("Release date: ")}
+            bold { append("Release date: ") }
             appendLine(movie.release_date)
 
-            bold { append("Popularity: ")}
+            bold { append("Popularity: ") }
             appendLine(movie.popularity.toString())
 
-            bold { append("Vote Average: ")}
+            bold { append("Vote Average: ") }
             appendLine(movie.vote_average.toString())
         }
     }
 
-    private fun showToast(str:String){
-        Toast.makeText(context,str, Toast.LENGTH_SHORT).show()
+    private fun showToast(str: String) {
+        Toast.makeText(context, str, Toast.LENGTH_SHORT).show()
     }
 
-    private fun updateDataToTrue(){
+    private fun updateDataToTrue() {
         var id = sharedViewModel.id.value
         var movie = sharedViewModel.movies
         if (movie != null) {
@@ -125,21 +125,20 @@ class DetailFragment : Fragment() {
                 room.getMovieDao().updateFavMovies(movie)
             }
             room.getMovieDao().getAll()
-            Log.d(ContentValues.TAG, "HOLAAAAAAAA" +room.getMovieDao().getAll() )
+            Log.d(ContentValues.TAG, "HOLAAAAAAAA" + room.getMovieDao().getAll())
         }
         if (id != null) {
-            Log.d(ContentValues.TAG, "HOLAAAAAAAA" + id)
             sharedViewModel.saveFavMovie(id)
+            Log.d(ContentValues.TAG, "UPDATE TRUE" + sharedViewModel.movieFavList)
         }
     }
 
-    private fun updateDataToFalse(){
+    private fun updateDataToFalse() {
         var id = sharedViewModel.id.value
         var movie = sharedViewModel.movies
         if (movie != null) {
             movie.video = false
         }
-
 
         lifecycleScope.launch {
             if (id != null) {
@@ -152,19 +151,26 @@ class DetailFragment : Fragment() {
                 room.getMovieDao().updateFavMovies(movie)
             }
         }
+        if (id != null) {
+            sharedViewModel.removeMovie(id)
+            Log.d(ContentValues.TAG, "UPDATE FALSE" + sharedViewModel.movieFavList)
+        }
     }
 
-    private fun btnClicked(){
+    private fun btnClicked() {
         binding.floatingActionButton.setOnClickListener {
             findNavController().navigate(R.id.action_detailFragment_to_favFragment)
         }
     }
 
-    private fun saveCheckBoxState(){
-        if (sharedViewModel.movies?.video == true){
-            binding.favIcon.isChecked = true
+    private fun saveCheckBoxState() {
+        var movieFav = sharedViewModel.movieFavList
+        var movieId = sharedViewModel.id
+
+        for (item in movieFav) {
+            if (item == movieId.value) {
+                binding.favIcon.isChecked = true
+            }
         }
     }
-
-
 }

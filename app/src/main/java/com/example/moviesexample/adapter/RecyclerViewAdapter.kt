@@ -84,16 +84,13 @@ class RecyclerViewAdapter(movieViewModel: MovieViewModel) : PagingDataAdapter<Mo
                 tvDesc.text = "${movie?.overview}"
 
                 Log.d(ContentValues.TAG, "EYYYYYYY" + movieFav.size)
-                var num = 0
-                //if (movieFav.size != 0) {
-                if(movie?.id == mov?.id){
+                //if(movie?.id == mov?.id){ favIcon.isChecked = true}
 
-                                favIcon.isChecked = true
-
-
+                for (item in movieFav){
+                    if (item == movie?.id){
+                        favIcon.isChecked = true
                     }
-               // }
-
+                }
 
                 val url = "https://image.tmdb.org/t/p/w780/${movie?.poster_path}"
 
