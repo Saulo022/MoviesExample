@@ -36,8 +36,15 @@ class DetailFragment : Fragment() {
 
     private val sharedViewModel : MovieViewModel by activityViewModels()
 
+    val room by lazy {
+        Room.databaseBuilder(
+            requireContext(), TMDBDatabase::class.java, "popular_movies"
+        ).build()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
     }
 
     override fun onCreateView(
@@ -68,13 +75,13 @@ class DetailFragment : Fragment() {
 
         Glide
             .with(this)
-            .load("https://image.tmdb.org/t/p/w780/${sharedViewModel.movies.backdrop_path}")
+            .load("https://image.tmdb.org/t/p/w780/${sharedViewModel.movies?.backdrop_path}")
             .into(binding.backdrop)
 
 
-        binding.Title.text = sharedViewModel.movies.title
-        binding.overview.text = sharedViewModel.movies.overview
-        bindDetailInfo(binding.detailInfo, sharedViewModel.movies)
+        binding.Title.text = sharedViewModel.movies?.title
+        binding.overview.text = sharedViewModel.movies?.overview
+        sharedViewModel.movies?.let { bindDetailInfo(binding.detailInfo, it) }
         //Log.d(ContentValues.TAG, "my Message" + sharedViewModel.movies.title)
     }
 
@@ -104,36 +111,45 @@ class DetailFragment : Fragment() {
     private fun updateDataToTrue(){
         var id = sharedViewModel.id.value
         var movie = sharedViewModel.movies
-        movie.video = true
-
-        val room =
-            this@DetailFragment.context?.let { Room.databaseBuilder(
-                it, TMDBDatabase::class.java, "popular_movies").build() }
+        if (movie != null) {
+            movie.video = true
+        }
 
         lifecycleScope.launch {
             if (id != null) {
-                if (room != null) {
+                if (movie != null) {
                     room.getMovieDao().updateFavMovies(movie)
                 }
             }
+            if (movie != null) {
+                room.getMovieDao().updateFavMovies(movie)
+            }
+            room.getMovieDao().getAll()
+            Log.d(ContentValues.TAG, "HOLAAAAAAAA" +room.getMovieDao().getAll() )
+        }
+        if (id != null) {
+            Log.d(ContentValues.TAG, "HOLAAAAAAAA" + id)
+            sharedViewModel.saveFavMovie(id)
         }
     }
 
     private fun updateDataToFalse(){
         var id = sharedViewModel.id.value
         var movie = sharedViewModel.movies
-        movie.video = false
+        if (movie != null) {
+            movie.video = false
+        }
 
-
-        val room =
-            this@DetailFragment.context?.let { Room.databaseBuilder(
-                it, TMDBDatabase::class.java, "popular_movies").build() }
 
         lifecycleScope.launch {
             if (id != null) {
-                if (room != null) {
+
+                if (movie != null) {
                     room.getMovieDao().updateFavMovies(movie)
                 }
+            }
+            if (movie != null) {
+                room.getMovieDao().updateFavMovies(movie)
             }
         }
     }
@@ -145,8 +161,10 @@ class DetailFragment : Fragment() {
     }
 
     private fun saveCheckBoxState(){
-        if (sharedViewModel.movies.video){
+        if (sharedViewModel.movies?.video == true){
             binding.favIcon.isChecked = true
         }
     }
+
+
 }

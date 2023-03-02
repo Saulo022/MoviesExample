@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.*
@@ -33,9 +34,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import hilt_aggregated_deps._dagger_hilt_android_internal_modules_ApplicationContextModule
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-
-
-
 class MovieFragment : Fragment() {
 
     //@Inject
@@ -43,12 +41,24 @@ class MovieFragment : Fragment() {
     //private lateinit var movieViewModel: MyViewModel
 
     private var _binding: FragmentMovieBinding? = null
-    private val binding:FragmentMovieBinding get() = _binding!!
+    private val binding: FragmentMovieBinding get() = _binding!!
+
+
 
     private val viewModel: MovieViewModel by viewModels()
-    private val sharedViewModel : MovieViewModel by activityViewModels()
+    private val sharedViewModel: MovieViewModel by activityViewModels()
 
-    private lateinit var recyclerViewAdapter : RecyclerViewAdapter
+    private lateinit var recyclerViewAdapter: RecyclerViewAdapter
+
+    private var movieFav = mutableListOf<Int>()
+
+    lateinit var checkBox : CheckBox
+
+    val room by lazy {
+        Room.databaseBuilder(
+            requireContext(), TMDBDatabase::class.java, "popular_movies"
+        ).build()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,13 +70,43 @@ class MovieFragment : Fragment() {
 
         initRecyclerview()
         loadData()
+
+        Log.d(ContentValues.TAG, "EYYYYYYY2")
+
         return view
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        initRecyclerview()
+        loadData()
+        recyclerViewAdapter.onItemClick = {
+
+            var movieList = listOf<Movie>()
+            lifecycleScope.launch {
+
+                room.getMovieDao().saveMovies(it)
+                //movieList = room.getMovieDao().getAll()
+
+                //Toast.makeText(context,"${movieList}", Toast.LENGTH_LONG).show()
+            }
+
+            sharedViewModel.saveId(it.id)
+            sharedViewModel.saveMovie(it)
+            findNavController().navigate(R.id.action_homeFragment_to_detailFragment)
+        }
+        Log.d(ContentValues.TAG, "OOOONNN RESUMEEEEEEEEEEEEEEE")
+
+
     }
 
     private fun initRecyclerview() {
 
-        binding.apply {
-            recyclerViewAdapter = RecyclerViewAdapter()
+        lifecycleScope.launch {
+
+            recyclerViewAdapter = RecyclerViewAdapter(sharedViewModel)
 
             binding.recyclerView.apply {
                 adapter = recyclerViewAdapter
@@ -75,42 +115,50 @@ class MovieFragment : Fragment() {
                 addItemDecoration(decoration)
                 setHasFixedSize(true)
                 //displayPopularMovies()
+                /*
+                adapter = RecyclerViewAdapter().apply {
+                    setData((sharedViewModel.movieFavList))
+                }*/
+
             }
         }
+
+
     }
 
 
-    private fun loadData(){
+    private fun loadData() {
         lifecycleScope.launch {
-            viewModel.getAllMovies.collect{
+            viewModel.getAllMovies(requireContext()).collect {
                 recyclerViewAdapter.submitData(it)
             }
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?){
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val room =
-            this@MovieFragment.context?.let { Room.databaseBuilder(
-                it, TMDBDatabase::class.java, "popular_movies").build() }
+
 
         recyclerViewAdapter.onItemClick = {
 
             var movieList = listOf<Movie>()
             lifecycleScope.launch {
-                if (room != null) {
-                    room.getMovieDao().saveMovies(it)
-                }
-                if (room != null) {
-                    movieList = room.getMovieDao().getAll()
-                }
+
+                room.getMovieDao().saveMovies(it)
+                //movieList = room.getMovieDao().getAll()
+
                 //Toast.makeText(context,"${movieList}", Toast.LENGTH_LONG).show()
             }
 
             sharedViewModel.saveId(it.id)
             sharedViewModel.saveMovie(it)
-            findNavController().navigate(R.id.action_movieFragment_to_detailFragment)
+            findNavController().navigate(R.id.action_homeFragment_to_detailFragment)
         }
+        Log.d(ContentValues.TAG, "EYYYYYYY1")
     }
+
 }
+
+

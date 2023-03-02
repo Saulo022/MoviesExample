@@ -1,7 +1,9 @@
 package com.example.moviesexample.adapter
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,18 +12,38 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Room
 import com.example.moviesexample.R
 import com.example.moviesexample.data.Movie
 import com.example.moviesexample.data.MovieList
 import com.example.moviesexample.databinding.RecyclerListRowBinding
+import com.example.moviesexample.db.TMDBDatabase
+import com.example.moviesexample.viewModel.MovieViewModel
 import com.squareup.picasso.Picasso
 
-class RecyclerViewAdapter : PagingDataAdapter<Movie, RecyclerViewAdapter.MyViewHolder>(diffCallback){
+class RecyclerViewAdapter(movieViewModel: MovieViewModel) : PagingDataAdapter<Movie, RecyclerViewAdapter.MyViewHolder>(diffCallback){
 
     var onItemClick : ((Movie) -> Unit)? = null
+
+    lateinit var favMovies :MutableList<Int>
+
+    private var movieFav = movieViewModel.movieFavList
+
+    var mov: Movie? = movieViewModel.movies
+
+    private lateinit var context:Context
+
+    val room by lazy {
+        Room.databaseBuilder(
+            context, TMDBDatabase::class.java, "popular_movies").build()
+    }
+
 
     inner class MyViewHolder(
         val binding: RecyclerListRowBinding
@@ -51,10 +73,27 @@ class RecyclerViewAdapter : PagingDataAdapter<Movie, RecyclerViewAdapter.MyViewH
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val movie = getItem(position)
 
+
+
+
         holder.binding.apply {
+
+
             holder.itemView.apply {
                 tvTitle.text = "${movie?.title}"
                 tvDesc.text = "${movie?.overview}"
+
+                Log.d(ContentValues.TAG, "EYYYYYYY" + movieFav.size)
+                var num = 0
+                //if (movieFav.size != 0) {
+                if(movie?.id == mov?.id){
+
+                                favIcon.isChecked = true
+
+
+                    }
+               // }
+
 
                 val url = "https://image.tmdb.org/t/p/w780/${movie?.poster_path}"
 
@@ -69,6 +108,13 @@ class RecyclerViewAdapter : PagingDataAdapter<Movie, RecyclerViewAdapter.MyViewH
             if (movie != null) {
                 onItemClick?.invoke(movie)
             }
+        }
+    }
+
+    fun setData(data: List<Int>){
+        favMovies.apply {
+            clear()
+            addAll(data)
         }
     }
 }

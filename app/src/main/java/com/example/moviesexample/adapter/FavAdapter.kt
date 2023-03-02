@@ -20,6 +20,13 @@ class FavAdapter : RecyclerView.Adapter<FavAdapter.MyViewHolder>(){
     lateinit var context:Context
 
 
+    /*
+    fun updateData(favorite: List<FavoriteData>){
+        data = favorite.toMutableList()
+        notifyDataSetChanged()
+    }
+     */
+
     inner class MyViewHolder(
         val binding: RecyclerLisFavBinding
     ) : RecyclerView.ViewHolder(binding.root)
@@ -54,11 +61,11 @@ class FavAdapter : RecyclerView.Adapter<FavAdapter.MyViewHolder>(){
 
         }
     }
-
     fun setData(data: List<Movie>){
         movieFav.apply {
             clear()
             addAll(data)
         }
     }
+
 }

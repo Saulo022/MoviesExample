@@ -17,6 +17,7 @@ interface MovieDao {
     @Update
     suspend fun updateFavMovies(movie: Movie)
 
+
     @Query("SELECT * FROM popular_movies WHERE video LIKE :video")
     suspend fun getFavMovies(video: Boolean): MutableList<Movie>
 }
