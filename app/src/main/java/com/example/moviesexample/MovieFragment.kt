@@ -60,6 +60,8 @@ class MovieFragment : Fragment() {
         ).build()
     }
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

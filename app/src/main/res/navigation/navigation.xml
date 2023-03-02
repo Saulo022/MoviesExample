@@ -22,9 +22,6 @@
         <action
             android:id="@+id/action_detailFragment_to_favFragment"
             app:destination="@id/favFragment" />
-        <action
-            android:id="@+id/action_detailFragment_to_movieFragment"
-            app:destination="@id/movieFragment" />
     </fragment>
     <fragment
         android:id="@+id/favFragment"
